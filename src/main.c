@@ -21,12 +21,12 @@ int main() {
 	mutexes_init();
 
     //Nomeando as Threads
-    pthread_t TRef;
+    pthread_t TRef, TModeloRef;
     // pthread_t TRef, TModeloRef, TControle, TLinearizacao, TRobo, Print_mostra;
 
     //Criando as Threads
     pthread_create(&TRef, NULL, Ref, NULL);
-    // pthread_create(&TModeloRef, NULL, ModeloRef, NULL);
+    pthread_create(&TModeloRef, NULL, ModeloRef, NULL);
     // pthread_create(&TControle, NULL, Controle, NULL);
     // pthread_create(&TLinearizacao, NULL, Linear, NULL); 
     // pthread_create(&TRobo, NULL, Robo, NULL);
@@ -35,7 +35,7 @@ int main() {
 
     //Finalizando as Threads
     pthread_join(TRef, NULL);
-    // pthread_join(TModeloRef, NULL);
+    pthread_join(TModeloRef, NULL);
     // pthread_join(TControle, NULL);
     // pthread_join(TLinearizacao, NULL);
     // pthread_join(TRobo, NULL);

@@ -4,7 +4,7 @@
 
 #define ALPHA1 3
 #define ALPHA2 3
-#define TEMPO_MAX 14
+#define TEMPO_MAX 14000
 
 #define TEMPO_REF 50
 #define TEMPO_REF_MS TEMPO_REF*1000

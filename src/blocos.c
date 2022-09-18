@@ -38,18 +38,18 @@ Matrix* y_m(Matrix* ref, Matrix* Ym){
 
     Matrix* ym_ponto = matrix_zeros(2,1);
     
-    VALUES(ym_ponto, 0, 0) = ALPHA1*(matrix_get_value(ref,0,0)-matrix_get_value(Ym,0,0)); // ymx_ponto = alpha1(X_ref - y_mx)
-    VALUES(ym_ponto, 1, 0) = ALPHA2*(matrix_get_value(ref,1,0)-matrix_get_value(Ym,1,0)); // ymy_ponto = alpha2(Y_ref)
+    VALUES(ym_ponto, 0, 0) = ALPHA1*(matrix_get_value(ref,0,0)- matrix_get_value(Ym,0,0)); // ymx_ponto = alpha1(X_ref - y_mx)
+    VALUES(ym_ponto, 1, 0) = ALPHA2*(matrix_get_value(ref,1,0)- matrix_get_value(Ym,1,0)); // ymy_ponto = alpha2(Y_ref)
     
     return ym_ponto;
 }
 
-Matrix* ModeloRefYm(Matrix* ym_ponto, Matrix* ym_pontoAntigo, double t)
+Matrix* ModeloRefYm(Matrix* ym_ponto, Matrix* ym_pontoAntigo, double dt)
 {
     Matrix* ym = matrix_zeros(2,1);
 
-    VALUES(ym, 0, 0) = (0.12) * (VALUES(ym_ponto, 0, 0) + VALUES(ym_pontoAntigo, 0, 0)) / 2;
-    VALUES(ym, 1, 0) = (0.12) * (VALUES(ym_ponto, 1, 0) + VALUES(ym_pontoAntigo, 1, 0)) / 2;
+    VALUES(ym, 0, 0) = (dt) * (VALUES(ym_ponto, 0, 0) + VALUES(ym_pontoAntigo, 0, 0)) / 2;
+    VALUES(ym, 1, 0) = (dt) * (VALUES(ym_ponto, 1, 0) + VALUES(ym_pontoAntigo, 1, 0)) / 2;
 
     return ym;
 }
