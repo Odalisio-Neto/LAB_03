@@ -67,6 +67,21 @@ Matrix* matrix_copy(Matrix* m) {
 
     return cp;
 }
+void matrix_copy_values(Matrix* to, Matrix* from) {
+    if (from == NULL || to == NULL)
+        return;
+    to->nlins = matrix_nlins(from);
+    to->ncols = matrix_ncols(from);
+
+    for (int i = 0; i < to->nlins; i++)
+    {
+        for (int j = 0; j < to->ncols; j++)
+        {
+            VALUES(to, i, j) = matrix_get_value(from, i, j);
+        }
+    }
+}
+
 
 Matrix* matrix_apply(F_aplicavel f, Matrix* m) {
     unsigned int nlins = matrix_nlins(m);

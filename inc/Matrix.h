@@ -38,7 +38,9 @@ Matrix* matrix_zeros(unsigned int nlins, unsigned int ncols);
 Matrix* matrix_ones(unsigned int nlins, unsigned int ncols);
 Matrix* matrix_identity(unsigned int nlins, unsigned int ncols);
 Matrix* matrix_copy(Matrix* m);
-Matrix* matrix_apply(F_aplicavel f, Matrix* m);
+void matrix_copy_values(Matrix *to, Matrix *from);
+
+Matrix *matrix_apply(F_aplicavel f, Matrix *m);
 
 void matrix_free(Matrix *m);
 void print_matrix(Matrix* m);

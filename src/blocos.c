@@ -44,12 +44,12 @@ Matrix* y_m(Matrix* ref, Matrix* Ym){
     return ym_ponto;
 }
 
-Matrix* ModeloRefYm(Matrix* ym_ponto, Matrix* ym_pontoAntigo, double dt)
+Matrix* ModeloRefYm(Matrix* ym_ponto, Matrix* ymdot_old, double dt)
 {
     Matrix* ym = matrix_zeros(2,1);
 
-    VALUES(ym, 0, 0) = (dt) * (VALUES(ym_ponto, 0, 0) + VALUES(ym_pontoAntigo, 0, 0)) / 2;
-    VALUES(ym, 1, 0) = (dt) * (VALUES(ym_ponto, 1, 0) + VALUES(ym_pontoAntigo, 1, 0)) / 2;
+    VALUES(ym, 0, 0) = (dt) * (VALUES(ym_ponto, 0, 0) + VALUES(ymdot_old, 0, 0)) / 2;
+    VALUES(ym, 1, 0) = (dt) * (VALUES(ym_ponto, 1, 0) + VALUES(ymdot_old, 1, 0)) / 2;
 
     return ym;
 }
@@ -84,7 +84,7 @@ Matrix* Linearizacao(Matrix* xt, Matrix* vt, double R)
 }
 
 //Bloco robo
-Matrix* RoboXtLinha(Matrix* xt, Matrix* ut)
+Matrix* RoboXtdot(Matrix* xt, Matrix* ut)
 {
     Matrix* Aux = matrix_zeros(3,2);
 
@@ -107,18 +107,27 @@ Matrix* RoboXtLinha(Matrix* xt, Matrix* ut)
     MResponse response = matrix_mul(Aux,ut);//retornei a multiplicação
     
     Matrix* xt_linha = response.m;
-
+    matrix_free(Aux);
     return xt_linha;
 }
 
-Matrix* RoboXt(Matrix* XtLinha, Matrix* XtLinhaAntigo, double t)
+Matrix* RoboXt(Matrix* Xdot, Matrix* old_Xdot, double dt)
 {
+
+    /**
+     * integração da matriz X(t)_dot para gerar X(t)
+     */
+
     Matrix* Xt = matrix_zeros(3,1);
 
-    VALUES(Xt, 0, 0) = (0.12)*(VALUES(XtLinha,0,0)+VALUES(XtLinhaAntigo,0,0)/2);
-    VALUES(Xt, 1, 0) = (0.12)*(VALUES(XtLinha,1,0)+VALUES(XtLinhaAntigo,1,0))/2;
-    VALUES(Xt, 2, 0) = (0.12)*(VALUES(XtLinha,2,0)+VALUES(XtLinhaAntigo,2,0))/2;
-    
+    VALUES(Xt, 0, 0) = (dt)*(VALUES(Xdot,0,0)+VALUES(old_Xdot,0,0)/2);
+    VALUES(Xt, 1, 0) = (dt)*(VALUES(Xdot,1,0)+VALUES(old_Xdot,1,0))/2;
+    VALUES(Xt, 2, 0) = (dt)*(VALUES(Xdot,2,0)+VALUES(old_Xdot,2,0))/2;
+
+    // VALUES(Xt, 0, 1) = (dt) * (VALUES(XtLinha, 0, 0) + VALUES(XtLinhaAntigo, 0, 0) / 2);
+    // VALUES(Xt, 1, 1) = (dt) * (VALUES(XtLinha, 1, 0) + VALUES(XtLinhaAntigo, 1, 0)) / 2;
+    // VALUES(Xt, 2, 1) = (dt) * (VALUES(XtLinha, 0, 0) + VALUES(XtLinhaAntigo, 0, 0) / 2);
+
     return Xt;
 }
 
@@ -132,11 +141,16 @@ Matrix* RoboYt(Matrix* xt, double R)
     VALUES(Aux2, 0, 0) = R*cos(VALUES(xt,2,0));
     VALUES(Aux2, 1, 0) = R*sin(VALUES(xt,2,0));
 
+    //TODO provavel erro
+
     MResponse response = matrix_mul(Aux, xt);
-    Aux = response.m;
-    
-    VALUES(Aux,0,0) = VALUES(Aux,0,0) + VALUES(Aux2,0,0);
-    VALUES(Aux,1,0) = VALUES(Aux,1,0) + VALUES(Aux2,1,0);
-    
-    return Aux;
+    Matrix *Out = response.m;
+
+    VALUES(Out, 0, 0) = VALUES(Out, 0, 0) + VALUES(Aux2, 0, 0);
+    VALUES(Out, 1, 0) = VALUES(Out, 1, 0) + VALUES(Aux2, 1, 0);
+
+    matrix_free(Aux);
+    matrix_free(Aux2);
+
+    return Out;
 }
