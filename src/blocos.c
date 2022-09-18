@@ -114,19 +114,15 @@ Matrix* RoboXtdot(Matrix* xt, Matrix* ut)
 Matrix* RoboXt(Matrix* Xdot, Matrix* old_Xdot, double dt)
 {
 
-    /**
-     * integração da matriz X(t)_dot para gerar X(t)
-     */
-
     Matrix* Xt = matrix_zeros(3,1);
 
-    VALUES(Xt, 0, 0) = (dt)*(VALUES(Xdot,0,0)+VALUES(old_Xdot,0,0)/2);
-    VALUES(Xt, 1, 0) = (dt)*(VALUES(Xdot,1,0)+VALUES(old_Xdot,1,0))/2;
-    VALUES(Xt, 2, 0) = (dt)*(VALUES(Xdot,2,0)+VALUES(old_Xdot,2,0))/2;
+    // VALUES(Xt, 0, 0) = VALUES(old_Xdot, 0, 0) + (dt) * (VALUES(Xdot, 0, 0));
+    // VALUES(Xt, 1, 0) = VALUES(old_Xdot, 1, 0) + (dt) * (VALUES(Xdot, 1, 0));
+    // VALUES(Xt, 2, 0) = VALUES(old_Xdot, 2, 0) + (dt) * (VALUES(Xdot, 2, 0));
 
-    // VALUES(Xt, 0, 1) = (dt) * (VALUES(XtLinha, 0, 0) + VALUES(XtLinhaAntigo, 0, 0) / 2);
-    // VALUES(Xt, 1, 1) = (dt) * (VALUES(XtLinha, 1, 0) + VALUES(XtLinhaAntigo, 1, 0)) / 2;
-    // VALUES(Xt, 2, 1) = (dt) * (VALUES(XtLinha, 0, 0) + VALUES(XtLinhaAntigo, 0, 0) / 2);
+    VALUES(Xt, 0, 0) = (dt / 2) * (VALUES(Xdot, 0, 0) + VALUES(old_Xdot, 0, 0)) ;
+    VALUES(Xt, 1, 0) = (dt / 2) * (VALUES(Xdot, 1, 0) + VALUES(old_Xdot, 1, 0)) ;
+    VALUES(Xt, 2, 0) = (dt / 2) * (VALUES(Xdot, 2, 0) + VALUES(old_Xdot, 2, 0)) ;
 
     return Xt;
 }

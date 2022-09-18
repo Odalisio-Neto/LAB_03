@@ -50,7 +50,7 @@ void *Ref(void *args)
         // mutexes_getRef(testBuf);
 
         // printf("x_ref : %.4f y_ref : %.4f\n", VALUES(testBuf, 0, 0), VALUES(testBuf, 1, 0));
-        // printf("x_ref : %.4f y_ref : %.4f, t: %lf, ts1 : %ld , TMAX: %d \n",
+        // printf("%.4f, %.4f, t: %lf, ts1 : %ld , TMAX: %d \n",
         //        VALUES(bufferRef, 0, 0), VALUES(bufferRef, 1, 0), t/1000, ts1.tv_nsec, TEMPO_MAX * 1000);
         // JitterRef[contRef]=TEMPO_REF - dif/1000.0;
         contRef++;
@@ -235,12 +235,11 @@ void *Robo(void *args)
         mutexes_getY(bufferY);
         mutexes_getXdot(bufferXdot);
 
-
-        matrix_copy_values(bufferXdot_old, bufferXdot);
-
-        bufferXdot = RoboXtdot(bufferX, bufferU);
+        // bufferX = RoboXt(bufferXdot, bufferX, dt);
 
         bufferX = RoboXt(bufferXdot, bufferXdot_old, dt);
+
+        bufferXdot = RoboXtdot(bufferX, bufferU);
 
         bufferY = RoboYt(bufferX, R);
 
@@ -248,10 +247,22 @@ void *Robo(void *args)
         mutexes_setX(bufferX);
         mutexes_setY(bufferY);
 
-        // printf("%.2lf, %4lf, %4lf, %4lf\n", t - dt,
-        //        matrix_get_value(bufferX, 0, 0),
-        //        matrix_get_value(bufferX, 1, 0),
-        //        matrix_get_value(bufferX, 2, 0));
+        // matrix_copy_values(bufferXdot_old, bufferXdot);
+
+        for (int i = 0; i < bufferXdot->nlins; i++)
+        {
+            for (int j = 0; j < bufferXdot->ncols; j++)
+            {
+                VALUES(bufferXdot_old, i, j) = VALUES(bufferXdot, i, j);
+            }
+        }
+
+        printf("%.2lf, %4lf, %4lf, %4lf\n", t - dt,
+               VALUES(bufferX, 0, 0),
+               VALUES(bufferX, 1, 0),
+               VALUES(bufferX, 2, 0));
+
+
         // JitterRobo[contRobo]=TEMPO_ROBO - dif/1000.0;
 
         clock_gettime(CLOCK_REALTIME, &ts2);
@@ -261,7 +272,7 @@ void *Robo(void *args)
         contRobo++;
     }
     matrix_free(bufferXdot);
-    matrix_free(bufferXdot_old);
+    // matrix_free(bufferXdot_old);
     matrix_free(bufferU);
     matrix_free(bufferV);
     matrix_free(bufferX);
