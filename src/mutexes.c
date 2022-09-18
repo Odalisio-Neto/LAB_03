@@ -11,20 +11,26 @@ static Matrix *Ref;
 static Matrix *Y;
 static Matrix *Ym;
 static Matrix *Ymdot;
-// static Matrix* V;
-// static Matrix* U;
-// static Matrix* X;
+static Matrix* V;
+static Matrix* U;
+static Matrix* X;
 
 static pthread_mutex_t mutexRef     = PTHREAD_MUTEX_INITIALIZER;
 static pthread_mutex_t mutexY       = PTHREAD_MUTEX_INITIALIZER;
 static pthread_mutex_t mutexYm      = PTHREAD_MUTEX_INITIALIZER;
 static pthread_mutex_t mutexYmdot   = PTHREAD_MUTEX_INITIALIZER;
+static pthread_mutex_t mutexV       = PTHREAD_MUTEX_INITIALIZER;
+static pthread_mutex_t mutexU       = PTHREAD_MUTEX_INITIALIZER;
+static pthread_mutex_t mutexX       = PTHREAD_MUTEX_INITIALIZER;
 
 void mutexes_init() {
     Ref     = matrix_zeros(2,1);
     Y       = matrix_zeros(2,1);
     Ym      = matrix_zeros(2,1);
     Ymdot   = matrix_zeros(2,1);
+    V = matrix_zeros(2, 1);
+    U = matrix_zeros(2, 1);
+    X = matrix_zeros(2, 1);
 }
 
 void mutexes_destroy() {
@@ -33,12 +39,17 @@ void mutexes_destroy() {
     matrix_free(Y);
     matrix_free(Ym);
     matrix_free(Ymdot);
-
+    matrix_free(V);
+    matrix_free(U);
+    matrix_free(X);
 
     pthread_mutex_destroy(&mutexRef);
     pthread_mutex_destroy(&mutexY);
     pthread_mutex_destroy(&mutexYm);
     pthread_mutex_destroy(&mutexYmdot);
+    pthread_mutex_destroy(&mutexV);
+    pthread_mutex_destroy(&mutexU);
+    pthread_mutex_destroy(&mutexX);
 }
 
 void mutexes_setRef(Matrix* ref) {
@@ -172,7 +183,7 @@ void mutexes_setYmdot(Matrix *ymdot)
 
 void mutexes_getYmdot(Matrix *ymdot)
 {
-    if (ymdot) return;
+    if (ymdot == NULL) return;
     pthread_mutex_lock(&mutexYmdot);
     ymdot->ncols = Ymdot->ncols;
     ymdot->nlins = Ymdot->nlins;
@@ -185,4 +196,104 @@ void mutexes_getYmdot(Matrix *ymdot)
         }
     }
     pthread_mutex_unlock(&mutexYmdot);
+}
+
+void mutexes_setV(Matrix *v)
+{
+    pthread_mutex_lock(&mutexV);
+    V->ncols = v->ncols;
+    V->nlins = v->nlins;
+    for (int i = 0; i < v->nlins; i++)
+    {
+        for (int j = 0; j < v->ncols; j++)
+        {
+            VALUES(V, i, j) = matrix_get_value(v, i, j);
+        }
+    }
+    pthread_mutex_unlock(&mutexV);
+}
+
+void mutexes_getV(Matrix *v)
+{
+    if (v == NULL) return;
+    pthread_mutex_lock(&mutexV);
+    v->ncols = V->ncols;
+    v->nlins = V->nlins;
+
+    for (int i = 0; i < v->nlins; i++)
+    {
+        for (int j = 0; j < v->ncols; j++)
+        {
+            VALUES(v, i, j) = matrix_get_value(V, i, j);
+        }
+    }
+    pthread_mutex_unlock(&mutexV);
+}
+
+void mutexes_setU(Matrix *u)
+{
+    pthread_mutex_lock(&mutexU);
+    U->ncols = u->ncols;
+    U->nlins = u->nlins;
+
+    for (int i = 0; i < U->nlins; i++)
+    {
+        for (int j = 0; j < U->ncols; j++)
+        {
+            VALUES(U, i, j) = matrix_get_value(u, i, j);
+        }
+    }
+    pthread_mutex_unlock(&mutexU);
+}
+
+void mutexes_getU(Matrix *u)
+{
+    if (u == NULL)
+        return;
+    pthread_mutex_lock(&mutexU);
+    u->ncols = U->ncols;
+    u->nlins = U->nlins;
+
+    for (int i = 0; i < u->nlins; i++)
+    {
+        for (int j = 0; j < u->ncols; j++)
+        {
+            VALUES(u, i, j) = matrix_get_value(U, i, j);
+        }
+    }
+    pthread_mutex_unlock(&mutexU);
+}
+
+void mutexes_setX(Matrix *x)
+{
+    pthread_mutex_lock(&mutexX);
+    X->ncols = x->ncols;
+    X->nlins = x->nlins;
+
+    for (int i = 0; i < X->nlins; i++)
+    {
+        for (int j = 0; j < X->ncols; j++)
+        {
+            VALUES(X, i, j) = matrix_get_value(x, i, j);
+        }
+    }
+    pthread_mutex_unlock(&mutexX);
+}
+
+void mutexes_getX(Matrix *x)
+{
+    if (x == NULL)
+        return;
+    pthread_mutex_lock(&mutexX);
+    x->ncols = X->ncols;
+    x->nlins = X->nlins;
+
+    for (int i = 0; i < x->nlins; i++)
+    {
+        for (int j = 0; j < x->ncols; j++)
+        {
+            VALUES(x, i, j) = matrix_get_value(X, i, j);
+        }
+    }
+    pthread_mutex_unlock(&mutexX);
 }

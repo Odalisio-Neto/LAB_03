@@ -32,7 +32,7 @@ void *Ref(void *args)
     double T = TEMPO_REF; // milissegundos
     struct timespec ts1, ts2, ts3 = {0};
 
-    Matrix *bufferRef = matrix_zeros(2,1);
+    Matrix *bufferRef = matrix_zeros(2, 1);
 
     while (t <= TEMPO_MAX)
     {
@@ -61,7 +61,6 @@ void *Ref(void *args)
     return 0;
 }
 
-
 // TODO jitters
 void *ModeloRef(void *args)
 {
@@ -70,7 +69,7 @@ void *ModeloRef(void *args)
     double tm;
     T = TEMPO_MODELO_REF;
     Matrix *bufferRef = matrix_zeros(2, 1);
-    Matrix *bufferYm = matrix_zeros(2, 3);
+    Matrix *bufferYm = matrix_zeros(2, 1);
     Matrix *bufferYmdot = matrix_zeros(2, 1);
 
     while (t <= TEMPO_MAX)
@@ -109,37 +108,52 @@ void *ModeloRef(void *args)
     return 0;
 }
 
-// TODO demais threads
 //  // Bloco Controle
 //  void *Controle(void *args)
 //  {
-//      struct timespec ts1, ts2, ts3 = {0};
-//      double dif;
-//      double tm;
-//      T = TEMPO_CONTROLE;
-
+//     struct timespec ts1, ts2, ts3 = {0};
+//     double tm;
+//     T = TEMPO_CONTROLE;
+//     Matrix *bufferY = matrix_zeros(2, 1);
+//     Matrix *bufferYm = matrix_zeros(2, 1);
+//     Matrix *bufferYmdot = matrix_zeros(2, 1);
 //     while (t <= TEMPO_MAX)
 //     {
-//         // start=clock();
-//         sem_wait(&ConsomeY);
-//         sem_wait(&ConsomeYm);
-//         sem_wait(&ConsomeYmLinha);
-//         sem_wait(&ProduzV);
+//         // Y, Ym, Ymdot, V
+
 //         clock_gettime(CLOCK_REALTIME, &ts1);
 //         tm = 1000000 * ts1.tv_nsec - tm;
 //         t = t + T;
 
-//         matrix_free(bufferV);
-//         bufferV = ControleBloco(bufferYmLinha, bufferYm, bufferY);
-//         sem_post(&ProduzYm);
-//         sem_post(&ProduzYmLinha);
-//         sem_post(&ProduzY);
-//         sem_post(&ConsomeV);
-//         dif = t - tm;
+//         mutexes_getRef(bufferY);
+//         mutexes_getYm(bufferYm);
+//         mutexes_getYmdot(bufferYmdot);
+
+//         bufferYmdot = y_m(bufferY, bufferYm);
+//         bufferYm = ModeloRefYm(bufferYmdot, bufferYm, dt);
+
+//         printf("x_ref : %.4f y_ref : %.4f, y_m(0,0) : %.4f y_mdot(0,0) : %.4f, t: %lf, ts1 : %ld , TMAX: %d \n",
+//             VALUES(bufferY, 0, 0), VALUES(bufferY, 1, 0),
+//             VALUES(bufferYm, 0, 0), VALUES(bufferYmdot, 0, 0), t / 1000, ts1.tv_nsec, TEMPO_MAX);
+
+//         mutexes_setYm(bufferYm);
+//         mutexes_setYmdot(bufferYmdot);
+
+//         // JitterModeloRef[contModeloRef]=TEMPO__MODELO_REF - dif/1000.0;
+
+//         clock_gettime(CLOCK_REALTIME, &ts2);
+//         ts3.tv_sec = 0;
+//         ts3.tv_nsec = T * 1000000 - (ts2.tv_nsec - ts1.tv_nsec);
+
+//         nanosleep(&ts3, &ts3);
+//         contModeloRef++;
 //         // JitterControle[contControle]=TEMPO_CONTROLE-dif/1000.0;
-//         // usleep(TEMPO_CONTROLE_MS-dif);
 //     }
+//     matrix_free(bufferYmdot);
+//     matrix_free(bufferYm);
+//     matrix_free(bufferRef);
 // }
+// TODO demais threads
 
 // void *Linear(void *args)
 // {
