@@ -17,34 +17,12 @@
 #include "threads.h"
 
 
-
-double t = 0;
-int contRef=0;
-int contModeloRef=0;
-int contControle=0;
-int contLinearizacao=0;
-int contRobo=0;
-double T;
-
-double R = 0.3;
-
-//Semaforos para os Produtores
-sem_t ProduzRef, ProduzY, ProduzYm, ProduzYmLinha, ProduzV, ProduzX, ProduzU, Print_Mostra;
-
-//Semaforos Para os Consumidores
-sem_t ConsomeRef, ConsomeY, ConsomeYm, ConsomeYmLinha, ConsomeV, ConsomeX, ConsomeU;
-
-
-//Gerar Ref
-
-
-
-
 int main() {
 	mutexes_init();
 
     //Nomeando as Threads
-    pthread_t TRef, TModeloRef, TControle, TLinearizacao, TRobo, Print_mostra;
+    pthread_t TRef;
+    // pthread_t TRef, TModeloRef, TControle, TLinearizacao, TRobo, Print_mostra;
 
     //Criando as Threads
     pthread_create(&TRef, NULL, Ref, NULL);
