@@ -352,28 +352,35 @@ double matrix_det(Matrix *m) {
 
 // Implementação da matriz inversa pela matrix adjunta
 // A^-1 = (1/det(A)) * (adj(A))
-MResponse matrix_inversa(Matrix *m) {
+MResponse matrix_inversa(Matrix *m)
+{
     unsigned int nlins = matrix_nlins(m);
     unsigned int ncols = matrix_ncols(m);
 
     double det = matrix_det(m);
-    
+
     // matriz não inversível
-    if (det == 0) {
+    if (det == 0)
+    {
         MResponse response = {.m = MATRIX_NULL, .erro = MATRIZ_NAO_INVERSIVEL};
         return response;
     }
-    
-    Matrix* m1 = _alloc_matrix(nlins, ncols);
+
+    Matrix *m1 = _alloc_matrix(nlins, ncols);
     Matrix *aux = NULL;
     short sign = 1;
 
-    for (int i = 0; i < nlins; i++) {
-        for (int j = 0; j < ncols; j++) {
+    for (int i = 0; i < nlins; i++)
+    {
+        for (int j = 0; j < ncols; j++)
+        {
             aux = matrix_get_cofactor(m, i, j);
+            if ((i + j) % 2 == 0)
+                sign = 1;
+            else
+                sign = -1;
             VALUES(m1, i, j) = sign * matrix_det(aux);
 
-            sign = -sign;
             matrix_free(aux);
         }
     }
@@ -381,9 +388,8 @@ MResponse matrix_inversa(Matrix *m) {
     Matrix *m1_t = matrix_transposta(m1);
     matrix_free(m1);
 
-    Matrix *r = matrix_mul_com_escalar(1/det, m1_t);
+    Matrix *r = matrix_mul_com_escalar(1 / det, m1_t);
     matrix_free(m1_t);
-
 
     MResponse response = {.m = r, .erro = PROCESSO_SEM_ERRO};
 

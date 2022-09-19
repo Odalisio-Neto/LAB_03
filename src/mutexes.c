@@ -23,7 +23,9 @@ static pthread_mutex_t mutexYmdot   = PTHREAD_MUTEX_INITIALIZER;
 static pthread_mutex_t mutexV       = PTHREAD_MUTEX_INITIALIZER;
 static pthread_mutex_t mutexU       = PTHREAD_MUTEX_INITIALIZER;
 static pthread_mutex_t mutexX       = PTHREAD_MUTEX_INITIALIZER;
-static pthread_mutex_t mutexXdot       = PTHREAD_MUTEX_INITIALIZER;
+static pthread_mutex_t mutexXdot    = PTHREAD_MUTEX_INITIALIZER;
+
+static pthread_mutex_t mutexprint   = PTHREAD_MUTEX_INITIALIZER;
 
 void mutexes_init() {
     Ref     = matrix_zeros(2,1);
@@ -55,6 +57,16 @@ void mutexes_destroy() {
     pthread_mutex_destroy(&mutexU);
     pthread_mutex_destroy(&mutexX);
     pthread_mutex_destroy(&mutexXdot);
+
+    pthread_mutex_destroy(&mutexprint);
+}
+
+void mutexes_lockPrint() {
+    pthread_mutex_lock(&mutexprint);
+}
+
+void mutexes_unlockPrint() {
+    pthread_mutex_unlock(&mutexprint);
 }
 
 void mutexes_setRef(Matrix *ref)

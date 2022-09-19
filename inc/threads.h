@@ -16,6 +16,8 @@ void *Controle(void *args);
 void *Linear(void *args);
 void *Robo(void *args);
 
+void *print_thread(void *args);
+
 
 
 //  // Bloco Controle
