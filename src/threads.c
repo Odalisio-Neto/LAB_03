@@ -251,30 +251,9 @@ void *Robo(void *args)
         bufferX = RoboXt(bufferXdot, bufferXdot_old, 0.012);
         bufferY = RoboYt(bufferX, R);
 
-
-        // RoboXtdot1(bufferX, bufferU);
-        // RoboXt1(bufferX, bufferXdot, bufferXdot_old, dt);
-        // RoboYt1(bufferY,bufferX, R);
-
         mutexes_setXdot(bufferXdot);
         mutexes_setX(bufferX);
         mutexes_setY(bufferY);
-
-        // matrix_copy_values(bufferXdot_old, bufferXdot);
-
-        // for (int i = 0; i < bufferXdot->nlins; i++)
-        // {
-        //     for (int j = 0; j < bufferXdot->ncols; j++)
-        //     {
-        //         VALUES(bufferXdot_old, i, j) = VALUES(bufferXdot, i, j);
-        //     }
-        // }
-
-        // printf("%.2lf, %4lf, %4lf, %4lf\n", t - dt,
-        //        VALUES(bufferX, 0, 0),
-        //        VALUES(bufferX, 1, 0),
-        //        VALUES(bufferX, 2, 0));
-
 
         // JitterRobo[contRobo]=TEMPO_ROBO - dif/1000.0;
 
