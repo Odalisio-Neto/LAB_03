@@ -61,11 +61,13 @@ void mutexes_destroy() {
     pthread_mutex_destroy(&mutexprint);
 }
 
-void mutexes_lockPrint() {
+void mutexes_lockPrint() 
+{
     pthread_mutex_lock(&mutexprint);
 }
 
-void mutexes_unlockPrint() {
+void mutexes_unlockPrint() 
+{
     pthread_mutex_unlock(&mutexprint);
 }
 

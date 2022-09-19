@@ -43,8 +43,13 @@ void *Ref(void *args)
         tm = 1000000 * ts1.tv_nsec - tm;
         t = t + T;
 
+       
+
         bufferRef = defineRef(t / 1000); // verificar t = t*T ()
         mutexes_setRef(bufferRef);
+        printf("%lf,%lf,%lf\n", 
+            t, 
+            matrix_get_value(bufferRef, 0, 0)     , matrix_get_value(bufferRef, 1, 0));
 
 
         mutexes_getRef(testBuf);
@@ -196,7 +201,7 @@ void *Linear(void *args)
 
         bufferU = Linearizacao(bufferX, bufferV, R);
 
-        printf("%4lf %4lf \n", VALUES(bufferU, 0, 0), VALUES(bufferU, 1, 0));
+        // printf("%4lf %4lf \n", VALUES(bufferU, 0, 0), VALUES(bufferU, 1, 0));
         mutexes_setU(bufferU);
 
         // JitterLinearizacao[contLinearizacao]=TEMPO_LINEARIZACAO -dif/1000.0;
@@ -302,23 +307,35 @@ void *print_thread(void *args) {
         mutexes_getX(X);
         mutexes_getY(Y);
 
-        printf("%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf\n", 
-            t, 
-            matrix_get_value(Ref, 0, 0)     , matrix_get_value(Ref, 1, 0),
-            matrix_get_value(Ymponto, 0, 0) , matrix_get_value(Ymponto, 1, 0),
-            matrix_get_value(Ym, 0, 0)      , matrix_get_value(Ym, 1, 0),
-            matrix_get_value(V, 0, 0)       , matrix_get_value(V, 1, 0),
-            matrix_get_value(U, 0, 0)       , matrix_get_value(U, 1, 0),
-            matrix_get_value(X, 0, 0)       , matrix_get_value(X, 1, 0), matrix_get_value(X, 2, 0),
-            matrix_get_value(Y, 0, 0)       , matrix_get_value(Y, 1, 0)
-        );
-
-        // printf("%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf\n", 
+        // printf("%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf\n", 
         //     t, 
         //     matrix_get_value(Ref, 0, 0)     , matrix_get_value(Ref, 1, 0),
+        //     matrix_get_value(Ymponto, 0, 0) , matrix_get_value(Ymponto, 1, 0),
         //     matrix_get_value(Ym, 0, 0)      , matrix_get_value(Ym, 1, 0),
+        //     matrix_get_value(V, 0, 0)       , matrix_get_value(V, 1, 0),
+        //     matrix_get_value(U, 0, 0)       , matrix_get_value(U, 1, 0),
         //     matrix_get_value(X, 0, 0)       , matrix_get_value(X, 1, 0), matrix_get_value(X, 2, 0),
-        //     matrix_get_value(Y, 0, 0)       , matrix_get_value(Y, 1, 0));
+        //     matrix_get_value(Y, 0, 0)       , matrix_get_value(Y, 1, 0)
+        // );
+
+        printf("%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf\n",
+               t,
+               matrix_get_value(Ref, 0, 0),     // X_ref
+               matrix_get_value(Ref, 1, 0),     // Y_ref
+               matrix_get_value(Ymponto, 0, 0), // Ydot_x
+               matrix_get_value(Ymponto, 1, 0), // Ydot_x
+               matrix_get_value(Ym, 0, 0),      // Ymx
+               matrix_get_value(Ym, 1, 0),      // Ymy
+               matrix_get_value(V, 0, 0),       // Vx
+               matrix_get_value(V, 1, 0),       // Vy
+               matrix_get_value(U, 0, 0),       // Ux
+               matrix_get_value(U, 1, 0),       // Uy
+               matrix_get_value(X, 0, 0),       // X1
+               matrix_get_value(X, 1, 0),       // X2
+               matrix_get_value(X, 2, 0),       // X3
+               matrix_get_value(Y, 0, 0),       // Y1
+               matrix_get_value(Y, 1, 0)        // Y2
+        );
 
         mutexes_unlockPrint();
 

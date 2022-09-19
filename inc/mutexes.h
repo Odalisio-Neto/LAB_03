@@ -10,6 +10,9 @@
 void mutexes_init();
 void mutexes_destroy();
 
+void mutexes_lockPrint();
+void mutexes_unlockPrint();
+
 void mutexes_setRef(Matrix  *ref);
 void mutexes_getRef(Matrix *ref);
 

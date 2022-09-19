@@ -30,7 +30,7 @@ int main() {
     pthread_create(&TControle, NULL, Controle, NULL);
     pthread_create(&TLinearizacao, NULL, Linear, NULL); 
     pthread_create(&TRobo, NULL, Robo, NULL);
-   pthread_create(&Print_mostra, NULL, print_thread, NULL);
+    pthread_create(&Print_mostra, NULL, print_thread, NULL);
 
 
     //Finalizando as Threads
