@@ -196,7 +196,7 @@ void *Linear(void *args)
 
         bufferU = Linearizacao(bufferX, bufferV, R);
 
-        // printf("u(0,0) %4lf u(1,0) %4lf \n");
+        printf("%4lf %4lf \n", VALUES(bufferU, 0, 0), VALUES(bufferU, 1, 0));
         mutexes_setU(bufferU);
 
         // JitterLinearizacao[contLinearizacao]=TEMPO_LINEARIZACAO -dif/1000.0;
