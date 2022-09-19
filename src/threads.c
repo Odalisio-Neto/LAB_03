@@ -33,7 +33,7 @@ void *Ref(void *args)
     struct timespec ts1, ts2, ts3 = {0};
 
     Matrix *bufferRef = matrix_zeros(2, 1);
-    // Matrix *testBuf = matrix_zeros(2, 1);
+    Matrix *testBuf = matrix_zeros(2, 1);
 
     while (t <= TEMPO_MAX)
     {
@@ -47,7 +47,7 @@ void *Ref(void *args)
         mutexes_setRef(bufferRef);
 
 
-        // mutexes_getRef(testBuf);
+        mutexes_getRef(testBuf);
 
         // printf("x_ref : %.4f y_ref : %.4f\n", VALUES(testBuf, 0, 0), VALUES(testBuf, 1, 0));
         // printf("%.4f, %.4f, t: %lf, ts1 : %ld , TMAX: %d \n",
@@ -69,8 +69,10 @@ void *Ref(void *args)
 void *ModeloRef(void *args)
 {
     // clock_t start;
+    double t = 0;  // tempo calculado
+    double tm = 0; // tempo medido
     struct timespec ts1, ts2, ts3 = {0};
-    double tm;
+
     T = TEMPO_MODELO_REF;
     Matrix *bufferRef = matrix_zeros(2, 1);
     Matrix *bufferYm = matrix_zeros(2, 1);
@@ -85,19 +87,18 @@ void *ModeloRef(void *args)
 
         mutexes_getRef(bufferRef);
         mutexes_getYm(bufferYm);
-        mutexes_getYmdot(bufferYmdot);
+        mutexes_getYmdot(bufferYmdot_old);
 
         bufferYmdot = y_m(bufferRef, bufferYm);
         bufferYm = ModeloRefYm(bufferYmdot, bufferYmdot_old, dt);
 
-        // printf("x_ref : %.4f y_ref : %.4f, y_m(0,0) : %.4f y_mdot(0,0) : %.4f, t: %lf, ts1 : %ld , TMAX: %d \n",
-        //        VALUES(bufferRef, 0, 0), VALUES(bufferRef, 1, 0),
-        //        VALUES(bufferYm, 0, 0), VALUES(bufferYmdot, 0, 0), t / 1000, ts1.tv_nsec, TEMPO_MAX);
+        // printf("%.4f, %.4f,  %.4f, %.4f \n", VALUES(bufferYm, 0, 0),
+        //        VALUES(bufferYm, 1, 0), VALUES(bufferYmdot, 0, 0), VALUES(bufferYmdot, 1, 0));
+
+
 
         mutexes_setYm(bufferYm);
         mutexes_setYmdot(bufferYmdot);
-
-        matrix_copy_values(bufferYmdot_old, bufferYmdot);
 
         // JitterModeloRef[contModeloRef]=TEMPO__MODELO_REF - dif/1000.0;
 
@@ -109,9 +110,11 @@ void *ModeloRef(void *args)
         nanosleep(&ts3, &ts3);
         contModeloRef++;
     }
+    
     matrix_free(bufferYmdot);
     matrix_free(bufferYm);
     matrix_free(bufferRef);
+
     return 0;
 }
 
@@ -119,7 +122,9 @@ void *ModeloRef(void *args)
  void *Controle(void *args)
  {
     struct timespec ts1, ts2, ts3 = {0};
-    double tm;
+    double tm = 0; // tempo medido
+    double t = 0;
+
     T = TEMPO_CONTROLE;
 
     Matrix *bufferV = matrix_zeros(2, 1);
@@ -141,7 +146,7 @@ void *ModeloRef(void *args)
         bufferV = ControleBloco(bufferYmdot, bufferYm, bufferY);
 
         mutexes_setV(bufferV);
-        //TODO verificar se Y está com saida depois de implementar o bloco Y
+        // TODO verificar se Y está com saida depois de implementar o bloco Y
         // printf("V(0,0) : %.4f V(1,0) : %.4f, y(0,0) : %.4f y(1,0) : %.4f, y_m(0,0) : %.4f y_mdot(0,0) : %.4f, t: %lf \n",
         //        VALUES(bufferV, 0, 0), VALUES(bufferV, 1, 0), VALUES(bufferY, 0, 0), VALUES(bufferY, 1, 0),
         //         VALUES(bufferYm, 0, 0), VALUES(bufferYmdot, 0, 0), t / 1000);
@@ -169,7 +174,9 @@ void *ModeloRef(void *args)
 void *Linear(void *args)
 {
     struct timespec ts1, ts2, ts3 = {0};
-    double tm;
+    double tm = 0; // tempo medido
+    double t = 0;
+
     T = TEMPO_LINEARIZACAO;
 
     Matrix *bufferU = matrix_zeros(2, 1);
@@ -210,7 +217,8 @@ void *Linear(void *args)
 void *Robo(void *args)
 {
     struct timespec ts1, ts2, ts3 = {0};
-    double tm;
+    double tm = 0;
+    double t = 0;
     T = TEMPO_ROBO;
 
     Matrix *bufferY =  matrix_zeros(2, 1);
@@ -228,20 +236,25 @@ void *Robo(void *args)
         tm = 1000000 * ts1.tv_nsec - tm;
         t = t + T;
 
+
+        // bufferX = RoboXt(bufferXdot, bufferX, dt);
         
         mutexes_getU(bufferU);
         mutexes_getV(bufferV);
         mutexes_getX(bufferX);
         mutexes_getY(bufferY);
-        mutexes_getXdot(bufferXdot);
+        mutexes_getXdot(bufferXdot_old);
+        // mutexes_getXdot(bufferXdot);
 
-        // bufferX = RoboXt(bufferXdot, bufferX, dt);
-
-        bufferX = RoboXt(bufferXdot, bufferXdot_old, dt);
 
         bufferXdot = RoboXtdot(bufferX, bufferU);
-
+        bufferX = RoboXt(bufferXdot, bufferXdot_old, 0.012);
         bufferY = RoboYt(bufferX, R);
+
+
+        // RoboXtdot1(bufferX, bufferU);
+        // RoboXt1(bufferX, bufferXdot, bufferXdot_old, dt);
+        // RoboYt1(bufferY,bufferX, R);
 
         mutexes_setXdot(bufferXdot);
         mutexes_setX(bufferX);
@@ -249,18 +262,18 @@ void *Robo(void *args)
 
         // matrix_copy_values(bufferXdot_old, bufferXdot);
 
-        for (int i = 0; i < bufferXdot->nlins; i++)
-        {
-            for (int j = 0; j < bufferXdot->ncols; j++)
-            {
-                VALUES(bufferXdot_old, i, j) = VALUES(bufferXdot, i, j);
-            }
-        }
+        // for (int i = 0; i < bufferXdot->nlins; i++)
+        // {
+        //     for (int j = 0; j < bufferXdot->ncols; j++)
+        //     {
+        //         VALUES(bufferXdot_old, i, j) = VALUES(bufferXdot, i, j);
+        //     }
+        // }
 
-        printf("%.2lf, %4lf, %4lf, %4lf\n", t - dt,
-               VALUES(bufferX, 0, 0),
-               VALUES(bufferX, 1, 0),
-               VALUES(bufferX, 2, 0));
+        // printf("%.2lf, %4lf, %4lf, %4lf\n", t - dt,
+        //        VALUES(bufferX, 0, 0),
+        //        VALUES(bufferX, 1, 0),
+        //        VALUES(bufferX, 2, 0));
 
 
         // JitterRobo[contRobo]=TEMPO_ROBO - dif/1000.0;

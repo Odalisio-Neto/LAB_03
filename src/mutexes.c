@@ -88,8 +88,8 @@ void mutexes_getRef(Matrix *ref)
 
     pthread_mutex_lock(&mutexRef);
     // printf("===get lock \n");
-    ref->ncols = Ref->ncols;
-    ref->nlins = Ref->nlins;
+    // ref->ncols = Ref->ncols;
+    // ref->nlins = Ref->nlins;
 
     for (int i = 0; i < Ref->nlins; i++)
     {
@@ -98,6 +98,9 @@ void mutexes_getRef(Matrix *ref)
             VALUES(ref, i, j) = VALUES(Ref, i, j);
         }
     }
+    // ref = Ref;
+    // ref->values = Ref->values;
+
     // *(ref->values)  = * (Ref->values);
     // printf("*double values ref : %lf \t *double values REF : %lf \n", *(ref->values), *(Ref->values));
     // printf("ln %d cl %d ln %d cl %d\n", ref->nlins, ref->ncols, Ref->nlins, Ref->ncols);

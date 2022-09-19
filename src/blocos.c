@@ -38,8 +38,8 @@ Matrix* y_m(Matrix* ref, Matrix* Ym){
 
     Matrix* ym_ponto = matrix_zeros(2,1);
     
-    VALUES(ym_ponto, 0, 0) = ALPHA1*(matrix_get_value(ref,0,0)- matrix_get_value(Ym,0,0)); // ymx_ponto = alpha1(X_ref - y_mx)
-    VALUES(ym_ponto, 1, 0) = ALPHA2*(matrix_get_value(ref,1,0)- matrix_get_value(Ym,1,0)); // ymy_ponto = alpha2(Y_ref)
+    VALUES(ym_ponto, 0, 0) = ALPHA1*(VALUES(ref,0,0)- VALUES(Ym,0,0)); // ymx_ponto = alpha1(X_ref - y_mx)
+    VALUES(ym_ponto, 1, 0) = ALPHA2*(VALUES(ref,1,0)- VALUES(Ym,1,0)); // ymy_ponto = alpha2(Y_ref)
     
     return ym_ponto;
 }
@@ -111,6 +111,31 @@ Matrix* RoboXtdot(Matrix* xt, Matrix* ut)
     return xt_linha;
 }
 
+void RoboXtdot1(Matrix* Xdot, Matrix *xt, Matrix *ut)
+{
+    Matrix *Aux = matrix_zeros(3, 2);
+
+    /*
+     * @brief geração da Matriz que multiplica u(t) no bloco do Robô
+     *
+     * Aux = [cos(x_3) 0;
+     *        sin(x_3) 0;
+     *            0    1]
+     */
+
+    VALUES(Aux, 0, 0) = cos(VALUES(xt, 2, 0));
+    VALUES(Aux, 0, 1) = 0;
+    VALUES(Aux, 1, 0) = sin(VALUES(xt, 2, 0));
+    VALUES(Aux, 1, 1) = 0;
+    VALUES(Aux, 2, 0) = 0;
+    VALUES(Aux, 2, 1) = 1;
+
+    MResponse response = matrix_mul(Aux, ut); // retornei a multiplicação
+
+    Xdot = response.m;
+    matrix_free(Aux);
+}
+
 Matrix* RoboXt(Matrix* Xdot, Matrix* old_Xdot, double dt)
 {
 
@@ -125,6 +150,13 @@ Matrix* RoboXt(Matrix* Xdot, Matrix* old_Xdot, double dt)
     VALUES(Xt, 2, 0) = (dt / 2) * (VALUES(Xdot, 2, 0) + VALUES(old_Xdot, 2, 0)) ;
 
     return Xt;
+}
+
+void RoboXt1(Matrix* Xt, Matrix *Xdot, Matrix *old_Xdot, double dt)
+{
+    VALUES(Xt, 0, 0) = (dt / 2) * (VALUES(Xdot, 0, 0) + VALUES(old_Xdot, 0, 0));
+    VALUES(Xt, 1, 0) = (dt / 2) * (VALUES(Xdot, 1, 0) + VALUES(old_Xdot, 1, 0));
+    VALUES(Xt, 2, 0) = (dt / 2) * (VALUES(Xdot, 2, 0) + VALUES(old_Xdot, 2, 0));
 }
 
 Matrix* RoboYt(Matrix* xt, double R)
@@ -149,4 +181,25 @@ Matrix* RoboYt(Matrix* xt, double R)
     matrix_free(Aux2);
 
     return Out;
+}
+void RoboYt1(Matrix* Yt, Matrix *xt, double R){
+    Matrix *Aux = matrix_zeros(2, 3);
+    VALUES(Aux, 0, 0) = 1;
+    VALUES(Aux, 1, 1) = 1;
+
+    Matrix *Aux2 = matrix_zeros(2, 1);
+    VALUES(Aux2, 0, 0) = R * cos(VALUES(xt, 2, 0));
+    VALUES(Aux2, 1, 0) = R * sin(VALUES(xt, 2, 0));
+
+    // TODO provavel erro
+
+    MResponse response = matrix_mul(Aux, xt);
+    Matrix *Out = response.m;
+
+    VALUES(Yt, 0, 0) = VALUES(Out, 0, 0) + VALUES(Aux2, 0, 0);
+    VALUES(Yt, 1, 0) = VALUES(Out, 1, 0) + VALUES(Aux2, 1, 0);
+
+    matrix_free(Aux);
+    matrix_free(Aux2);
+
 }
